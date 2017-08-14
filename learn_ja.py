@@ -21,11 +21,10 @@ import numpy as np
 import random
 import sys
 
+
 # path = get_file('nietzsche.txt', origin='https://s3.amazonaws.com/text-datasets/nietzsche.txt')
 path = 'data/train.ja'
 text = open(path).read()
-
-text = text.replace(' ', '')
 
 print('corpus length:', len(text))
 
