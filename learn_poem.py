@@ -78,6 +78,10 @@ for iteration in range(1, 60):
     print()
     print('-' * 50)
     print('Iteration', iteration)
+
+
+    batch_size = 128
+
     model.fit(X, y,
               batch_size=128,
               epochs=1)

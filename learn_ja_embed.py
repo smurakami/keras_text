@@ -28,6 +28,8 @@ import numpy as np
 import random
 import sys
 
+import tensorflow as tf
+
 
 class WDict:
     def __init__(self, path):
@@ -69,6 +71,12 @@ class WDict:
         return len(self.i2w.keys())
 
 
+def to_one_hot(x, depth):
+    y = np.zeros((len(x), depth), dtype=np.bool)
+    y[np.arange(len(x)), x] = True
+    return y
+
+
 def main():
     # path = get_file('nietzsche.txt', origin='https://s3.amazonaws.com/text-datasets/nietzsche.txt')
     path = 'data/train.ja'
@@ -81,8 +89,6 @@ def main():
         # s = ['<s>'] + s + ['</s>']
         enc = wdict.encode(s)
         data.append(enc)
-
-    # data = data[:100]
 
     data_flatten = sum(data, [])
 
@@ -117,11 +123,11 @@ def main():
     #     y[i, next_words[i]] = 1
 
     X = np.array(sentences, dtype=np.int)
-    # y = np.array(next_words, dtype=np.int)
-    y = np.zeros((len(sentences), wdict.num_words()), dtype=np.bool)
-    for i, word in enumerate(next_words):
-        y[i, word] = 1
-
+    y = np.array(next_words, dtype=np.int)
+    # y = np.zeros((len(sentences), wdict.num_words()), dtype=np.bool)
+    # for i, word in enumerate(next_words):
+    #     y[i, word] = 1
+    # y = tf.one_hot(next_words, wdict.num_words())
 
     # build the model: a single LSTM
     print('Build model...')
@@ -151,9 +157,25 @@ def main():
         print()
         print('-' * 50)
         print('Iteration', iteration)
-        model.fit(X, y,
-                  batch_size=128,
-                  epochs=1)
+
+
+        batch_size = 128
+        counter = 0
+
+        for i in range(0, len(X), batch_size):
+            y_ = to_one_hot(y[i:i+batch_size], wdict.num_words())
+            loss = model.train_on_batch(
+                X[i:i+batch_size],
+                y_
+                )
+            if counter % 10 == 0:
+                print("batch: {}/{}, loss: {}".format(i, len(X), loss))
+            counter += 1
+
+        # model.fit(X, y,
+        #           batch_size=128,
+        #           epochs=1)
+
         model.save('learned_model', overwrite=True)
 
         start_index = random.randint(0, len(data_flatten) - maxlen - 1)
