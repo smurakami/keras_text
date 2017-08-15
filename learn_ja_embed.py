@@ -176,7 +176,7 @@ def main():
         #           batch_size=128,
         #           epochs=1)
 
-        model.save('learned_model', overwrite=True)
+        model.save('data/learn_ja_embed', overwrite=True)
 
         start_index = random.randint(0, len(data_flatten) - maxlen - 1)
 
