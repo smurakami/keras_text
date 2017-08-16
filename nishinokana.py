@@ -171,7 +171,7 @@ def main():
         return np.argmax(probas)
 
     # train the model, output generated text after each iteration
-    for iteration in range(1, 60):
+    for iteration in range(1, 60000):
         print()
         print('-' * 50)
         print('Iteration', iteration)
